@@ -11,15 +11,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="source\close.png" />
-    <None Remove="source\close_hover.png" />
-    <None Remove="source\maximize.png" />
-    <None Remove="source\maximize_hover.png" />
-    <None Remove="source\minimize.png" />
-    <None Remove="source\minimize_hover.png" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Include="..\.editorconfig" Link=".editorconfig" />
   </ItemGroup>
 
@@ -29,15 +20,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\PoeSniperCore\PoeSniperCore.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Resource Include="source\close.png" />
-    <Resource Include="source\close_hover.png" />
-    <Resource Include="source\maximize.png" />
-    <Resource Include="source\maximize_hover.png" />
-    <Resource Include="source\minimize.png" />
-    <Resource Include="source\minimize_hover.png" />
   </ItemGroup>
 
 </Project>
