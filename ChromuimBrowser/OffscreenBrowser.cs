@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ChromuimBrowser
 {
-    public class OffscreenBrowser
+    public class OffscreenBrowser : IDisposable
     {
         private ChromiumWebBrowser _browser;
         private AutoResetEvent _autoResetEvent;
@@ -22,19 +22,15 @@ namespace ChromuimBrowser
         {
             var settings = new CefSettings() { CachePath = @"D:\CefSharpExample\CefSharpExample\Cache\" };
             settings.CefCommandLineArgs["autoplay-policy"] = "no-user-gesture-required";
-
-            try
-            {
+            
+            if (!Cef.IsInitialized)
                 Cef.Initialize(settings, performDependencyCheck: true, browserProcessHandler: null);
-            }
-            catch { }
 
             CefSharpSettings.ShutdownOnExit = true;
 
             _browser = new ChromiumWebBrowser("", null, new RequestContext());
             _autoResetEvent = new AutoResetEvent(false);
             _browser.BrowserInitialized += InitialBrowser;
-            
             _autoResetEvent.WaitOne();
         }
 
@@ -102,6 +98,11 @@ namespace ChromuimBrowser
         public async Task<JavascriptResponse> ExecuteJavaScriptAsync(string script)
         {
             return await _browser.EvaluateScriptAsync(script);
+        }
+
+        public void Dispose()
+        {
+            _browser.Dispose();
         }
     }
 }
