@@ -10,10 +10,20 @@ namespace PoeSniperUI
         public string Id { get; }
         public PoeTradeObserver TradeObserver { get; }
 
+        private string _name;
+        public string Name
+        {
+            get { return _name; }
+            set
+            {
+                _name = value;
+                NotifyPropertyChanged("Name");
+            }
+        }
+
         public string Url
         {
             get { return TradeObserver.Url; }
-
             set
             {
                 TradeObserver.Url = value;
@@ -24,7 +34,6 @@ namespace PoeSniperUI
         public bool IsActive
         {
             get { return _isActive; }
-
             set
             {
                 _isActive = value;
@@ -35,7 +44,6 @@ namespace PoeSniperUI
         public bool IsLoading
         {
             get { return _isLoading; }
-
             set
             {
                 _isLoading = value;
