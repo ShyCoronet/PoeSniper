@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace PoeSniperCore
 {
-    public class PoeTradeObserver
+    public class PoeTradeObserver : IDisposable
     {
         public string Url { get; set; }
         public bool IsActive { get; private set; }
@@ -84,6 +84,11 @@ namespace PoeSniperCore
                             "const observer = new MutationObserver(callback)\n";
 
             _isInitialScript = _browser.ExecuteJavaScriptAsync(script).Result.Success;
+        }
+
+        public void Dispose()
+        {
+            _browser.Dispose();
         }
     }
 }
