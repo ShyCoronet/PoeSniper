@@ -30,7 +30,7 @@
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ToggleButton}, Path=IsChecked, 
                                                                     UpdateSourceTrigger=PropertyChanged}" Value="True">
-                                                <Setter Property="Background" Value="#23a9f2"/>
+                                                <Setter Property="Background" Value="#9147ff"/>
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
