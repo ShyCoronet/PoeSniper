@@ -15,10 +15,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.31" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\PoeSniperCore\PoeSniperCore.csproj" />
   </ItemGroup>
 
