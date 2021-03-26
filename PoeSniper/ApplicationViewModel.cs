@@ -2,18 +2,39 @@
 using PoeSniper;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
 
 namespace PoeSniperUI
 {
-    public class ApplicationViewModel
+    public class ApplicationViewModel : INotifyPropertyChanged
+
     {
         public IList<LiveSearch> searches { get; }
         public IList<string> searchResults { get; }
 
+        public event PropertyChangedEventHandler PropertyChanged;
+
         private const int _maxSearchCount = 12;    // the maximum number of searches for an official trade is 12
+        private int _searchesCount;
+
+        public int SearchesCount
+        {
+            get { return _searchesCount; }
+            set
+            {
+                _searchesCount = value;
+                NotifyPropertyChanged("SearchesCount");
+            }
+        }
+
+        public void NotifyPropertyChanged([CallerMemberName] string prop = "")
+        {
+            PropertyChanged(this, new PropertyChangedEventArgs(prop));
+        }
 
         private RelayCommand _addSearch;
         public RelayCommand AddSearch
@@ -23,6 +44,7 @@ namespace PoeSniperUI
                 return _addSearch ?? (_addSearch = new RelayCommand(() =>
                 {
                     searches.Add(new LiveSearch());
+                    SearchesCount = searches.Count;
                 }, 
                 
                 () => 
@@ -40,6 +62,7 @@ namespace PoeSniperUI
                 return _removeSearch ?? (_removeSearch = new RelayCommand<LiveSearch>((search) => 
                 {
                     searches.Remove(search);
+                    SearchesCount = searches.Count;
                     search.TradeObserver.Dispose();
                 }));
             }
@@ -57,6 +80,7 @@ namespace PoeSniperUI
                         search.TradeObserver.Dispose();
                     }
                     searches.Clear();
+                    SearchesCount = searches.Count;
                 }));
             }
         }
@@ -116,6 +140,18 @@ namespace PoeSniperUI
                             search.TradeObserver.StopObserve();
                         });
                     }
+                }));
+            }
+        }
+
+        private RelayCommand _removeAllResutls;
+        public RelayCommand RemoveAllResults
+        {
+            get
+            {
+                return _removeAllResutls ?? (_removeAllResutls = new RelayCommand(() =>
+                {
+                    searchResults.Clear();
                 }));
             }
         }
