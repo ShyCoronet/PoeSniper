@@ -3,8 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:PoeSniper"
-        xmlns:custom="clr-namespace:PoeSniperUI.CustomControls" xmlns:poesniperui="clr-namespace:PoeSniperUI" 
+        xmlns:custom="clr-namespace:PoeSniperUI.CustomControls" xmlns:poesniperui="clr-namespace:PoeSniperUI"
         d:DataContext="{d:DesignInstance Type=poesniperui:ApplicationViewModel}"
         mc:Ignorable="d"
         Title="MainWindow" MinHeight="600" MinWidth="1300" WindowStartupLocation="CenterScreen"
@@ -25,7 +24,8 @@
             <Setter Property="RenderTransformOrigin" Value="0.5, 0.5"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Style.Triggers>
-                <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Border}, Path=IsMouseOver, UpdateSourceTrigger=PropertyChanged}" Value="True">
+                <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Border}, 
+                    Path=IsMouseOver, UpdateSourceTrigger=PropertyChanged}" Value="True">
                     <Setter Property="Fill" Value="#FFFFFF"/>
                 </DataTrigger>
             </Style.Triggers>
@@ -43,6 +43,9 @@
                     <Setter Property="Opacity" Value="0.7"/>
                 </DataTrigger>
             </Style.Triggers>
+        </Style>
+        <Style x:Key="CounterBlock" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource RobotoFontStyle}">
+            <Setter Property="Text" Value=""/>
         </Style>
     </Window.Resources>
     <Grid Background="#2f3136">
@@ -114,16 +117,38 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition/>
                     <ColumnDefinition/>
-                    <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
                 <custom:MenuButton Grid.Column="0" x:Name="ResultButton" Text="Result" GroupName="MenuButtons"/>
                 <custom:MenuButton Grid.Column="1" x:Name="SetupButton" Text="Setup" GroupName="MenuButtons" IsSelected="True"/>
-                <custom:MenuButton Grid.Column="2" x:Name="SettingsButton" Text="Settings" GroupName="MenuButtons"/>
             </Grid>
         </Grid>
         <!--#endregion-->
         <!--#region Result-->
         <Grid Grid.Row="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="74px"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Border Margin="6,6,6,6" Background="#36393f" CornerRadius="12" Grid.Row="0">
+                <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                    <Button Command="{Binding RemoveAllResults}" Background="#f04747" Height="40px" Width="100px" Margin="0,0,12,0" 
+                            Style="{StaticResource CreateSearchButton}">
+                        <TextBlock Style="{StaticResource RobotoFontStyle}" Text="Remove all" Foreground="#FFFFFF"/>
+                    </Button>
+                </StackPanel>
+            </Border>
+            <Border Margin="6,0,6,6" Grid.Row="1" CornerRadius="12" Background="#36393f">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <ItemsControl ItemsSource="{Binding searchResults}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBox Margin="12,6,12,0" Height="45px" Style="{StaticResource Input}" IsReadOnly="True"
+                                     Text="{Binding Mode=OneWay}"/>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Border>
             <Grid.Style>
                 <Style TargetType="{x:Type Grid}">
                     <Setter Property="Visibility" Value="Hidden"/>
@@ -139,21 +164,30 @@
         <!--#region Setup-->
         <Grid x:Name="SetupArea" Grid.Row="2">
             <Grid.RowDefinitions>
+                <RowDefinition Height="74px"/>
                 <RowDefinition/>
-                <RowDefinition Height="8*"/>
             </Grid.RowDefinitions>
-            <Border Margin="12,6,12,6" Background="#36393f" CornerRadius="12" Grid.Row="0">
+            <Border Margin="6,6,6,6" Background="#36393f" CornerRadius="12" Grid.Row="0">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                    <Button Command="{Binding AddSearch}" Background="Green" Height="40px" Width="100px" Margin="0,0,6,0" 
+                    <Border Style="{StaticResource InputBorder}" Height="40px" Width="140px" Margin="0,0,12,0">
+                        <TextBlock Style="{StaticResource RobotoFontStyle}" Foreground="#FFFFFF"
+                                   FontSize="16px" HorizontalAlignment="Center" VerticalAlignment="Center" 
+                                   Text="{Binding SearchesCount, StringFormat={}Count: {0}/12}"/>
+                    </Border>
+                    <Button Command="{Binding AddSearch}" Background="#9147ff" Height="40px" Width="100px" Margin="0,0,6,0" 
                             Style="{StaticResource CreateSearchButton}">
-                        <TextBlock Style="{StaticResource RobotoFontStyle}" Foreground="White" Text="Create search"/>
+                        <TextBlock Style="{StaticResource RobotoFontStyle}" Foreground="#FFFFFF" Text="Create search"/>
                     </Button>
-                    <Button Background="#23a9f2" Height="40px" Margin="6,0,6,0" Width="100px" 
-                            Style="{StaticResource ButtonStyle}"/>
-                    <Button Background="#23a9f2" Height="40px" Margin="6,0,6,0" Width="100px" 
-                            Style="{StaticResource ButtonStyle}"/>
-                    <Button Background="#f04747" Height="40px" Margin="6,0,6,0" Width="100px" 
-                            Style="{StaticResource ButtonStyle}"/>
+                    <Button Style="{StaticResource ButtonStyle}" Background="#9147ff" Height="40px" 
+                            Margin="6,0,6,0" Width="100px"
+                            Command="{Binding ConnectAllSearches}">
+                        <TextBlock Style="{StaticResource RobotoFontStyle}" Foreground="#FFFFFF" Text="Connect all"/>
+                    </Button>
+                    <Button Background="#f04747" Height="40px" Margin="6,0,6,0" Width="100px"
+                            Style="{StaticResource ButtonStyle}"
+                            Command="{Binding RemoveAllSearches}">
+                        <TextBlock Style="{StaticResource RobotoFontStyle}" Foreground="#FFFFFF" Text="Remove all"/>
+                    </Button>
                 </StackPanel>
             </Border>
             <Border Margin="6,0,6,6" Grid.Row="1" CornerRadius="12" Background="#36393f">
@@ -161,11 +195,18 @@
                     <ItemsControl HorizontalAlignment="Center" ItemsSource="{Binding searches}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <custom:SearchBar Uid="{Binding Id}" TextName="{Binding IsActive}"
-                                                  TextUrl="{Binding Url}" IsLoading="{Binding IsLoading}"
-                                                  Command="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}, Path=DataContext.Connect}"
+                                <custom:SearchBar Uid="{Binding Id}" TextName="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                  TextUrl="{Binding Url, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                                  IsLoading="{Binding IsLoading}"
+                                                  IsActive="{Binding IsActive}"
+                                                  Command="{Binding RelativeSource={RelativeSource AncestorType=Window, 
+                                    Mode=FindAncestor}, Path=DataContext.Connect}"
                                                   CommandParameter="{Binding}"
-                                                  ToggleStateCommand="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}, Path=DataContext.StartSearch}"/>
+                                                  ToggleStateCommand="{Binding 
+                                    RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}, 
+                                    Path=DataContext.ChangeStateSearch}"
+                                                  RemoveSearchCommand="{Binding RelativeSource={RelativeSource 
+                                    AncestorType=Window, Mode=FindAncestor}, Path=DataContext.RemoveSearch}"/>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
@@ -176,46 +217,6 @@
                     <Setter Property="Visibility" Value="Hidden"/>
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding IsSelected, ElementName=SetupButton}" Value="True">
-                            <Setter Property="Visibility" Value="Visible"/>
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </Grid.Style>
-        </Grid>
-        <!--#endregion-->
-        <!--#region Settings-->
-        <Grid x:Name="SettingsArea" Grid.Row="2">
-            <Grid.RowDefinitions>
-                <RowDefinition/>
-                <RowDefinition/>
-                <RowDefinition/>
-                <RowDefinition/>
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="140px"/>
-                <ColumnDefinition/>
-            </Grid.ColumnDefinitions>
-            <!--#region POESESSID-->
-            <Border x:Name="POESESSIDTitle" Grid.Row="0" Grid.Column="0" Style="{StaticResource InputBorder}"
-                    Height="{Binding ElementName=POESESSIDBox, Path=Height}" Width="130px">
-                <TextBlock Style="{StaticResource ResourceKey=RobotoFontStyle}" VerticalAlignment="Center" HorizontalAlignment="Center" 
-                           FontSize="20px" Text="POESESSID" Foreground="#FFFFFF"/>
-            </Border>
-            <TextBox x:Name="POESESSIDBox" Grid.Row="0" Grid.Column="1" Style="{StaticResource Input}" 
-                     Text="Teeeeeest" FontSize="14px" HorizontalAlignment="Left"/>
-            <!--#endregion-->
-            <!--#region AutoMode-->
-            <Border x:Name="AutoModeTitle" Grid.Row="1" Grid.Column="0" Style="{StaticResource InputBorder}"
-                    Height="{Binding ElementName=POESESSIDTitle, Path=Height}" Width="130px">
-                <TextBlock Style="{StaticResource ResourceKey=RobotoFontStyle}" VerticalAlignment="Center" HorizontalAlignment="Center" 
-                           FontSize="20px" Text="Auto mode" Foreground="#FFFFFF"/>
-            </Border>
-            <!--#endregion-->
-            <Grid.Style>
-                <Style TargetType="{x:Type Grid}">
-                    <Setter Property="Visibility" Value="Hidden"/>
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding IsSelected, ElementName=SettingsButton}" Value="True">
                             <Setter Property="Visibility" Value="Visible"/>
                         </DataTrigger>
                     </Style.Triggers>
