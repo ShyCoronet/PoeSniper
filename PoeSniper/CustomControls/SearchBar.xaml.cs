@@ -1,17 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace PoeSniperUI.CustomControls
 {
@@ -45,6 +34,15 @@ namespace PoeSniperUI.CustomControls
         {
             get { return (bool)GetValue(IsLoadingProperty); }
             set { SetValue(IsLoadingProperty, value); }
+        }
+
+        private static readonly DependencyProperty IsActiveProperty =
+            DependencyProperty.Register("IsActive", typeof(bool), typeof(SearchBar));
+
+        public bool IsActive
+        {
+            get { return (bool)GetValue(IsActiveProperty); }
+            set { SetValue(IsActiveProperty, value); }
         }
 
         private static readonly DependencyProperty IdProperty =
@@ -90,6 +88,15 @@ namespace PoeSniperUI.CustomControls
         {
             get { return (ICommand)GetValue(ToggleStateCommandProperty); }
             set { SetValue(ToggleStateCommandProperty, value); }
+        }
+
+        private static readonly DependencyProperty RemoveSearchCommandProperty =
+            DependencyProperty.Register("RemoveSearchCommand", typeof(ICommand), typeof(SearchBar));
+
+        public ICommand RemoveSearchCommand
+        {
+            get { return (ICommand)GetValue(RemoveSearchCommandProperty); }
+            set { SetValue(RemoveSearchCommandProperty, value); }
         }
 
         public SearchBar()
