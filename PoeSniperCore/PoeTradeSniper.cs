@@ -7,6 +7,9 @@ namespace PoeSniperCore
 {
     public class PoeTradeSniper : IDisposable
     {
+        private OffscreenBrowser browser;
+        private bool isInitialScript;
+
         public string Url { get; set; }
         public bool IsActive { get; private set; }
         public bool IsLoading { get; private set; }
@@ -15,22 +18,19 @@ namespace PoeSniperCore
         public event EventHandler<LoadingStateChangedEventArgs> LoadingStateChanged;
         public event EventHandler<ConsoleMessageEventArgs> TradeOfferReceived
         {
-            add => _browser.ConsoleMessageReceive += value;
-            remove => _browser.ConsoleMessageReceive -= value;
+            add => browser.ConsoleMessageReceive += value;
+            remove => browser.ConsoleMessageReceive -= value;
         }
-
-        private OffscreenBrowser _browser;
-        private bool _isInitialScript;
 
         public PoeTradeSniper(string url)
         {
-            _browser = new OffscreenBrowser();
+            browser = new OffscreenBrowser();
             Url = url;
         }
 
         public void AuthenticationToPoeTrade(string sessionId)
         {
-            _browser.SetCookie("https://www.pathofexile.com/", "POESESSID", sessionId);
+            browser.SetCookie("https://www.pathofexile.com/", "POESESSID", sessionId);
         }
 
         public void LoadRessource()
@@ -40,7 +40,7 @@ namespace PoeSniperCore
             IsLoading = true;
             LoadingStateChanged?.Invoke(this, new LoadingStateChangedEventArgs(IsLoading));
 
-            _browser.LoadPage(Url).Wait();
+            browser.LoadPage(Url).Wait();
 
             Task.Delay(1000).Wait(); // Required for full execution of all scripts on the page
 
@@ -50,11 +50,11 @@ namespace PoeSniperCore
 
         public bool StartSnipe()
         {
-            if (!_isInitialScript) InitialScript();
+            if (!isInitialScript) InitialScript();
 
             string script = "observer.observe(target, config)";
 
-            var result = _browser.ExecuteJavaScriptAsync(script).Result;
+            var result = browser.ExecuteJavaScriptAsync(script).Result;
             IsActive = result.Success;
             ObserverStateChanged?.Invoke(this, new ObserverStateChangedEventArgs(result.Success));
 
@@ -67,7 +67,7 @@ namespace PoeSniperCore
 
             if (IsActive)
             {
-                var result = _browser.ExecuteJavaScriptAsync(script).Result;
+                var result = browser.ExecuteJavaScriptAsync(script).Result;
                 if (result.Success) 
                 {
                     IsActive = false;
@@ -78,7 +78,7 @@ namespace PoeSniperCore
 
         public void Dispose()
         {
-            _browser.Dispose();
+            browser.Dispose();
         }
 
         private void InitialScript()
@@ -88,7 +88,7 @@ namespace PoeSniperCore
                             "const target = document.querySelector('div.results')\n" +
                             "const observer = new MutationObserver(callback)\n";
 
-            _isInitialScript = _browser.ExecuteJavaScriptAsync(script).Result.Success;
+            isInitialScript = browser.ExecuteJavaScriptAsync(script).Result.Success;
         }
     }
 }
