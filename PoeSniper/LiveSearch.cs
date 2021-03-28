@@ -7,8 +7,7 @@ namespace PoeSniperUI
 {
     public class LiveSearch : INotifyPropertyChanged
     {
-        public string Id { get; }
-        public PoeTradeObserver TradeObserver { get; }
+        public PoeTradeSniper TradeObserver { get; }
 
         private string _name;
         public string Name
@@ -16,7 +15,7 @@ namespace PoeSniperUI
             get { return _name; }
             set
             {
-                _name = value;
+                _name = value.Trim();
                 NotifyPropertyChanged("Name");
             }
         }
@@ -26,7 +25,7 @@ namespace PoeSniperUI
             get { return TradeObserver.Url; }
             set
             {
-                TradeObserver.Url = value;
+                TradeObserver.Url = value.Trim();
                 NotifyPropertyChanged("Url");
             }
         }
@@ -53,16 +52,13 @@ namespace PoeSniperUI
 
         private bool _isActive;
         private bool _isLoading;
-        private Guid _guid;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public LiveSearch()
+        public LiveSearch(string sessionId)
         {
-            _guid = Guid.NewGuid();
-            Id = _guid.ToString();
-            TradeObserver = new PoeTradeObserver("https://www.pathofexile.com/trade/search/Ritual/L5DZUn/live");
-            TradeObserver.AuthenticationToPoeTrade("a140bcc59bb595c5c5253b2d091a9298");
+            TradeObserver = new PoeTradeSniper("https://www.pathofexile.com/trade/search/Ritual/L5DZUn/live");
+            TradeObserver.AuthenticationToPoeTrade(sessionId);
             TradeObserver.ObserverStateChanged += OnObserverStateChanged;
             TradeObserver.LoadingStateChanged += OnLoadingStateChanged;
         }
