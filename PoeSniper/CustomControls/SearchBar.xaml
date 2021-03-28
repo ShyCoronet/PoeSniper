@@ -22,20 +22,61 @@
                 </DataTrigger>
             </Style.Triggers>
         </Style>
+        <Style TargetType="TextBlock" x:Key="ChangeStateButtonText" BasedOn="{StaticResource RobotoFontStyle}">
+            <Setter Property="Text" Value="Start"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsActive, ElementName=this}" Value="True">
+                    <Setter Property="Text" Value="Stop"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
     </UserControl.Resources>
     <Border>
         <StackPanel Orientation="Horizontal">
-            <TextBox Text="{Binding TextName, ElementName=this}" Width="300px" Height="40px" 
+            <Grid>
+                <TextBox x:Name="Name" Text="{Binding TextName, ElementName=this}" Width="300px" Height="40px" 
                      Style="{StaticResource Input}" Margin="6,0,6,0"/>
-            <TextBox x:Name="UrlInput" Text="{Binding TextUrl, ElementName=this}" Width="500px" Height="40px" 
-                     Style="{StaticResource Input}" Margin="0,0,6,0">
-                <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="TextChanged">
-                        <i:InvokeCommandAction Command="{Binding UrlBoxCommand, ElementName=this}"
-                                               CommandParameter="{Binding CommandParameter, ElementName=this}"/>
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
-            </TextBox>
+                <TextBlock Text="Name (optional)">
+                    <TextBlock.Style>
+                        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource RobotoFontStyle}">
+                            <Setter Property="IsHitTestVisible" Value="False"/>
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Setter Property="Foreground" Value="#FFFFFF"/>
+                            <Setter Property="Opacity" Value="0.5"/>
+                            <Setter Property="Margin" Value="18,0,0,0"/>
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                            <Setter Property="FontSize" Value="{Binding FontSize, ElementName=Name}"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Text, ElementName=Name}" Value="">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+            </Grid>
+            <Grid>
+                <TextBox x:Name="Url" Text="{Binding TextUrl, ElementName=this}" Width="500px" Height="40px"
+                     Style="{StaticResource Input}" Margin="0,0,6,0"/>
+                <TextBlock Text="URL">
+                    <TextBlock.Style>
+                        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource RobotoFontStyle}">
+                            <Setter Property="IsHitTestVisible" Value="False"/>
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Setter Property="Foreground" Value="#FFFFFF"/>
+                            <Setter Property="Opacity" Value="0.5"/>
+                            <Setter Property="Margin" Value="12,0,0,0"/>
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                            <Setter Property="FontSize" Value="{Binding FontSize, ElementName=Url}"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Text, ElementName=Url}" Value="">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+            </Grid>
             <Grid VerticalAlignment="Center" Margin="0,0,6,0">
                 <Path RenderTransformOrigin="0.75, 0.75" Data="{StaticResource Spinner}" Fill="#ffffff">
                     <Path.LayoutTransform>
@@ -69,20 +110,22 @@
                 </Path>
             </Grid>
             <Button Command="{Binding Command, ElementName=this}" CommandParameter="{Binding CommandParameter, ElementName=this}"
-                    x:Name="ConnectButton" Background="#23a9f2" Width="74px" Height="40px"  
+                    x:Name="ConnectButton" Background="#303032" Width="74px" Height="40px"  
                     Style="{StaticResource ConntectionButtonStyle}" Margin="0,0,6,0">
                 <TextBlock Text="Connect" Foreground="#ffffff" Style="{StaticResource ResourceKey=RobotoFontStyle}"/>
             </Button>
-            <Button x:Name="StartStopButton" Background="#23a9f2"
-                        Width="{Binding ElementName=ConnectButton, Path=Width}" Height="40px"
-                        Style="{StaticResource ButtonStyle}" Margin="0,0,6,0"
+            <Button x:Name="StartStopButton" Background="#303032"
+                    Width="{Binding ElementName=ConnectButton, Path=Width}" Height="40px"
+                    Style="{StaticResource ButtonStyle}" Margin="0,0,6,0"
                     Command="{Binding ToggleStateCommand, ElementName=this}"
                     CommandParameter="{Binding CommandParameter, ElementName=this}">
-                <TextBlock Text="Start" Foreground="#ffffff" Style="{StaticResource ResourceKey=RobotoFontStyle}"/>
+                <TextBlock Foreground="#ffffff" Style="{StaticResource ChangeStateButtonText}"/>
             </Button>
             <Button Margin="0,0,6,0" x:Name="RemoveButton" Background="#f04747" 
-                        Width="{Binding ElementName=ConnectButton, Path=Width}" 
-                        Height="40px"  Style="{StaticResource ButtonStyle}">
+                    Width="{Binding ElementName=ConnectButton, Path=Width}" 
+                    Height="40px"  Style="{StaticResource ButtonStyle}"
+                    Command="{Binding RemoveSearchCommand, ElementName=this}"
+                    CommandParameter="{Binding CommandParameter, ElementName=this}">
                 <Path Margin="0,0,4,0" Data="{StaticResource TrashCan}" Fill="#ffffff">
                     <Path.LayoutTransform>
                         <ScaleTransform ScaleX="1.5" ScaleY="1.5"/>
