@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace PoeSniperCore
 {
-    public class PoeTradeObserver : IDisposable
+    public class PoeTradeSniper : IDisposable
     {
         public string Url { get; set; }
         public bool IsActive { get; private set; }
@@ -22,7 +22,7 @@ namespace PoeSniperCore
         private OffscreenBrowser _browser;
         private bool _isInitialScript;
 
-        public PoeTradeObserver(string url)
+        public PoeTradeSniper(string url)
         {
             _browser = new OffscreenBrowser();
             Url = url;
@@ -35,7 +35,7 @@ namespace PoeSniperCore
 
         public void LoadRessource()
         {
-            if (IsActive) StopObserve();
+            if (IsActive) StopSnipe();
 
             IsLoading = true;
             LoadingStateChanged?.Invoke(this, new LoadingStateChangedEventArgs(IsLoading));
@@ -48,9 +48,9 @@ namespace PoeSniperCore
             LoadingStateChanged?.Invoke(this, new LoadingStateChangedEventArgs(IsLoading));
         }
 
-        public bool StartObserve()
+        public bool StartSnipe()
         {
-            if (!_isInitialScript) InitialSript();
+            if (!_isInitialScript) InitialScript();
 
             string script = "observer.observe(target, config)";
 
@@ -61,7 +61,7 @@ namespace PoeSniperCore
             return IsActive;
         }
 
-        public void StopObserve()
+        public void StopSnipe()
         {
             string script = "observer.disconnect()";
 
@@ -73,10 +73,15 @@ namespace PoeSniperCore
                     IsActive = false;
                     ObserverStateChanged?.Invoke(this, new ObserverStateChangedEventArgs(false));
                 };
-            }           
+            }         
         }
 
-        private void InitialSript()
+        public void Dispose()
+        {
+            _browser.Dispose();
+        }
+
+        private void InitialScript()
         {
             string script = "const config = { childList: true }\n" +
                             "const callback = (mutationList, observer) => { const whisperBtn = document.querySelector('button.btn.btn-default.whisper-btn')\nif(whisperBtn !== null) { whisperBtn.click()\nconsole.log('click') } }\n" +
@@ -84,11 +89,6 @@ namespace PoeSniperCore
                             "const observer = new MutationObserver(callback)\n";
 
             _isInitialScript = _browser.ExecuteJavaScriptAsync(script).Result.Success;
-        }
-
-        public void Dispose()
-        {
-            _browser.Dispose();
         }
     }
 }
