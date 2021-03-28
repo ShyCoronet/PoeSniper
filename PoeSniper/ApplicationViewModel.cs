@@ -1,9 +1,6 @@
-﻿using CefSharp;
-using PoeSniper;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
@@ -11,7 +8,6 @@ using System.Windows;
 namespace PoeSniperUI
 {
     public class ApplicationViewModel : INotifyPropertyChanged
-
     {
         public IList<LiveSearch> searches { get; }
         public IList<string> searchResults { get; }
@@ -31,6 +27,17 @@ namespace PoeSniperUI
             }
         }
 
+        private string _sessionId = "a140bcc59bb595c5c5253b2d091a9298";
+        public string SessionId
+        {
+            get { return _sessionId; }
+            set
+            {
+                _sessionId = value.Trim();
+                NotifyPropertyChanged("SessionId");
+            }
+        }
+
         public void NotifyPropertyChanged([CallerMemberName] string prop = "")
         {
             PropertyChanged(this, new PropertyChangedEventArgs(prop));
@@ -43,13 +50,13 @@ namespace PoeSniperUI
             {
                 return _addSearch ?? (_addSearch = new RelayCommand(() =>
                 {
-                    searches.Add(new LiveSearch());
+                    searches.Add(new LiveSearch(SessionId));
                     SearchesCount = searches.Count;
                 }, 
                 
                 () => 
                 {
-                    return searches.Count != _maxSearchCount;
+                    return searches.Count != _maxSearchCount && _sessionId != string.Empty;
                 }));
             }
         }
@@ -129,7 +136,7 @@ namespace PoeSniperUI
                         await Task.Run(() =>
                         {
                             search.TradeObserver.TradeOfferReceived += OnTradeOfferReceived;
-                            search.TradeObserver.StartObserve();
+                            search.TradeObserver.StartSnipe();
                         });
                     }
                     else
@@ -137,7 +144,7 @@ namespace PoeSniperUI
                         await Task.Run(() =>
                         {
                             search.TradeObserver.TradeOfferReceived -= OnTradeOfferReceived;
-                            search.TradeObserver.StopObserve();
+                            search.TradeObserver.StopSnipe();
                         });
                     }
                 }));
