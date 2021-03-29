@@ -155,15 +155,7 @@ namespace PoeSniperUI
 
         private void OnTradeOfferReceived(object sender, CefSharp.ConsoleMessageEventArgs e)
         {
-            string tradeOfferMessage = Clipboard.GetText();
-            object lockObj = new();
-            lock (lockObj)
-            {
-                Application.Current.Dispatcher.Invoke(() =>
-                {
-                    searchResults.Add(tradeOfferMessage);
-                });
-            } 
+            Application.Current.Dispatcher.Invoke(() => searchResults.Add(e.Message));
         }
     }
 }
