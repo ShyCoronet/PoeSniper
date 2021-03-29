@@ -84,9 +84,9 @@ namespace PoeSniperCore
         private void InitialScript()
         {
             string script = "const config = { childList: true }\n" +
-                            "const callback = (mutationList, observer) => { const whisperBtn = document.querySelector('button.btn.btn-default.whisper-btn')\nif(whisperBtn !== null) { whisperBtn.click()\nconsole.log('click') } }\n" +
-                            "const target = document.querySelector('div.results')\n" +
-                            "const observer = new MutationObserver(callback)\n";
+                                "const callback = (mutationList, observer) => { const whisperBtn = document.querySelector('button.btn.btn-default.whisper-btn')\nif(whisperBtn !== null) { console.log(whisperBtn._v_clipboard.text()) } }\n" +
+                                "const target = document.querySelector('div.results')\n" +
+                                "const observer = new MutationObserver(callback)\n";
 
             isInitialScript = browser.ExecuteJavaScriptAsync(script).Result.Success;
         }
