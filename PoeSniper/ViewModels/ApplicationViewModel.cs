@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Windows;
+using KeyboardHook;
 
 namespace PoeSniperUI
 {
@@ -10,6 +12,8 @@ namespace PoeSniperUI
         private const int maxSearchCount = 12;    // the maximum number of searches for an official trade is 12
         private int searchesCount;
         private string sessionId = "a140bcc59bb595c5c5253b2d091a9298";
+        private NotificationService notificationService;
+        private PasteCommandHandler pasteHandler;
 
         private RelayCommand addSearch;
         private RelayCommand removeSearch;
@@ -86,11 +90,12 @@ namespace PoeSniperUI
             {
                 return connect ?? (connect = new RelayCommand<SniperViewModel>((search) =>
                 {
-                    Task.Run(() => search.TradeSniper.LoadRessource());
+                    Task.Run(() => search.TradeSniper.LoadPage());
                 },
                 (search) =>
                 {
-                    return !search.IsLoading;
+                    return !search.IsLoading && !(search.Name == string.Empty) && 
+                    !(search.Url == string.Empty) && !(search.IsActive);
                 }));
             }
         }
@@ -101,11 +106,11 @@ namespace PoeSniperUI
             {
                 return connectAllSearches ?? (connectAllSearches = new RelayCommand(() =>
                 {
-                    foreach (var search in searches)
-                    {
-                        if (!search.IsLoading)
-                            Task.Run(() => search.TradeSniper.LoadRessource());
-                    }
+                foreach (var search in searches)
+                {
+                    if (!search.IsLoading)
+                        Task.Run(() => search.TradeSniper.LoadPage());
+                }
                 }));
             }
         }
@@ -114,11 +119,11 @@ namespace PoeSniperUI
         {
             get
             {
-                return changeStateSearch ?? (changeStateSearch = new RelayCommand<SniperViewModel>(async (search) =>
+                return changeStateSearch ?? (changeStateSearch = new RelayCommand<SniperViewModel>((search) =>
                 {
                     if (!search.IsActive)
                     {
-                        await Task.Run(() =>
+                        Task.Run(() =>
                         {
                             search.TradeSniper.TradeOfferReceived += OnTradeOfferReceived;
                             search.TradeSniper.StartSnipe();
@@ -126,7 +131,7 @@ namespace PoeSniperUI
                     }
                     else
                     {
-                        await Task.Run(() =>
+                        Task.Run(() =>
                         {
                             search.TradeSniper.TradeOfferReceived -= OnTradeOfferReceived;
                             search.TradeSniper.StopSnipe();
@@ -151,10 +156,24 @@ namespace PoeSniperUI
         {
             searches = new ObservableCollection<SniperViewModel>();
             searchResults = new ObservableCollection<string>();
+            notificationService = new NotificationService();
+            pasteHandler = new PasteCommandHandler();
+            pasteHandler.Pasted += PopTradeOffer;
+            pasteHandler.Install();
+        }
+
+        private void PopTradeOffer(object sender, EventArgs e)
+        {
+            if (searchResults.Count != 0)
+            {
+                Clipboard.SetText(searchResults[0]);
+                searchResults.RemoveAt(0);
+            }
         }
 
         private void OnTradeOfferReceived(object sender, CefSharp.ConsoleMessageEventArgs e)
         {
+            notificationService.ShowNotification(e.Message);
             Application.Current.Dispatcher.Invoke(() => searchResults.Add(e.Message));
         }
     }
