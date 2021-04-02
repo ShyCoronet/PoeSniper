@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace PoeSniperCore
 {
-    public class ObserverStateChangedEventArgs : EventArgs
+    public class SniperStateChangedEventArgs : EventArgs
     {
         public bool IsActive { get; }
 
-        public ObserverStateChangedEventArgs(bool state)
+        public SniperStateChangedEventArgs(bool state)
         {
             IsActive = state;
         }
