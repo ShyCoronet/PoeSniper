@@ -45,6 +45,15 @@ namespace PoeSniperUI.CustomControls
             set { SetValue(IsActiveProperty, value); }
         }
 
+        private static readonly DependencyProperty IsConnectedProperty =
+           DependencyProperty.Register("IsConnected", typeof(bool), typeof(SearchBar));
+
+        public bool IsConnected
+        {
+            get { return (bool)GetValue(IsConnectedProperty); }
+            set { SetValue(IsConnectedProperty, value); }
+        }
+
         private static readonly DependencyProperty IdProperty =
             DependencyProperty.Register("Id", typeof(string), typeof(SearchBar));
 
