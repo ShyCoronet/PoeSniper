@@ -4,9 +4,10 @@ namespace PoeSniperUI
 {
     public class SniperViewModel : ViewModelBase
     {
-        private string name;
+        private string name = string.Empty;
         private bool isActive;
         private bool isLoading;
+        private bool isConnected;
 
         public PoeTradeSniper TradeSniper { get; }
 
@@ -34,15 +35,22 @@ namespace PoeSniperUI
             set => this.SetProperty(ref isLoading, value, nameof(IsLoading));
         }
 
-        public SniperViewModel(string sessionId)
+        public bool IsConnected
         {
-            TradeSniper = new PoeTradeSniper("https://www.pathofexile.com/trade/search/Ritual/L5DZUn/live");
-            TradeSniper.AuthenticationToPoeTrade(sessionId);
-            TradeSniper.ObserverStateChanged += OnObserverStateChanged;
-            TradeSniper.LoadingStateChanged += OnLoadingStateChanged;
+            get => this.isConnected;
+            set => this.SetProperty(ref isConnected, value, nameof(IsConnected));
         }
 
-        private void OnObserverStateChanged(object sender, ObserverStateChangedEventArgs e)
+        public SniperViewModel(string sessionId)
+        {
+            TradeSniper = new PoeTradeSniper("https://www.pathofexile.com/trade/search/Ritual/1EQ0s5/live");
+            TradeSniper.AuthenticationToPoeTrade(sessionId);
+            TradeSniper.SniperStateChanged += OnObserverStateChanged;
+            TradeSniper.LoadingStateChanged += OnLoadingStateChanged;
+            TradeSniper.ConnectionStateChanged += OnConnectionStateChanged;
+        }
+
+        private void OnObserverStateChanged(object sender, SniperStateChangedEventArgs e)
         {
             IsActive = e.IsActive;
         }
@@ -50,6 +58,11 @@ namespace PoeSniperUI
         private void OnLoadingStateChanged(object sender, LoadingStateChangedEventArgs e)
         {
             IsLoading = e.IsLoading;
+        }
+
+        private void OnConnectionStateChanged(object sender, ConnectionStateChangedEventArgs e)
+        {
+            IsConnected = e.IsConnected;
         }
     }
 }
