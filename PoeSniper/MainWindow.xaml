@@ -31,22 +31,18 @@
             </Style.Triggers>
         </Style>
         <!--#endregion-->
+        <!--#region SearchSetupBorder-->
         <Style x:Key="SearchSetupBorder" TargetType="{x:Type Border}">
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="Height" Value="60px"/>
             <Setter Property="Width" Value="Auto"/>
         </Style>
-        <Style x:Key="CreateSearchButton" BasedOn="{StaticResource ButtonStyle}" TargetType="{x:Type Button}">
-            <Setter Property="IsEnabled" Value="True"/>
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding IsEnabled, RelativeSource={RelativeSource Mode=Self}}" Value="False">
-                    <Setter Property="Opacity" Value="0.7"/>
-                </DataTrigger>
-            </Style.Triggers>
-        </Style>
+        <!--#endregion-->
+        <!--#region CounterBlock-->
         <Style x:Key="CounterBlock" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource RobotoFontStyle}">
             <Setter Property="Text" Value=""/>
         </Style>
+        <!--#endregion-->
     </Window.Resources>
     <Grid Background="#2f3136">
         <Grid.RowDefinitions>
@@ -131,9 +127,10 @@
             </Grid.RowDefinitions>
             <Border Margin="6,6,6,6" Background="#36393f" CornerRadius="12" Grid.Row="0">
                 <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
-                    <Button Command="{Binding RemoveAllResults}" Background="#f04747" Height="40px" Width="100px" Margin="0,0,12,0" 
-                            Style="{StaticResource CreateSearchButton}">
-                        <TextBlock Style="{StaticResource RobotoFontStyle}" Text="Remove all" Foreground="#FFFFFF"/>
+                    <Button Command="{Binding RemoveAllResults}" Background="#f04747" Height="40px" Width="100px" Margin="0,0,6,0" 
+                            Style="{StaticResource ButtonStyle}">
+                        <TextBlock Style="{StaticResource RobotoFontStyle}" Text="Remove all" Foreground="#FFFFFF"
+                                   FontSize="14px"/>
                     </Button>
                 </StackPanel>
             </Border>
@@ -202,18 +199,21 @@
                                    Text="{Binding SearchesCount, StringFormat={}Count: {0}/12}"/>
                         </Border>
                         <Button Command="{Binding AddSearch}" Background="#9147ff" Height="40px" Width="100px" Margin="0,0,6,0" 
-                            Style="{StaticResource CreateSearchButton}">
-                            <TextBlock Style="{StaticResource RobotoFontStyle}" Foreground="#FFFFFF" Text="Create search"/>
+                            Style="{StaticResource ButtonStyle}">
+                            <TextBlock Style="{StaticResource RobotoFontStyle}" Foreground="#FFFFFF" Text="Create search"
+                                       FontSize="14px"/>
                         </Button>
                         <Button Style="{StaticResource ButtonStyle}" Background="#9147ff" Height="40px" 
                             Margin="6,0,6,0" Width="100px"
                             Command="{Binding ConnectAllSearches}">
-                            <TextBlock Style="{StaticResource RobotoFontStyle}" Foreground="#FFFFFF" Text="Connect all"/>
+                            <TextBlock Style="{StaticResource RobotoFontStyle}" Foreground="#FFFFFF" Text="Connect all"
+                                       FontSize="14px"/>
                         </Button>
                         <Button Background="#f04747" Height="40px" Margin="6,0,6,0" Width="100px"
                             Style="{StaticResource ButtonStyle}"
                             Command="{Binding RemoveAllSearches}">
-                            <TextBlock Style="{StaticResource RobotoFontStyle}" Foreground="#FFFFFF" Text="Remove all"/>
+                            <TextBlock Style="{StaticResource RobotoFontStyle}" Foreground="#FFFFFF" Text="Remove all"
+                                       FontSize="14px"/>
                         </Button>
                     </StackPanel>
                 </Grid>
@@ -227,6 +227,7 @@
                                                   TextUrl="{Binding Url, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                                                   IsLoading="{Binding IsLoading}"
                                                   IsActive="{Binding IsActive}"
+                                                  IsConnected="{Binding IsConnected}"
                                                   Command="{Binding RelativeSource={RelativeSource AncestorType=Window, 
                                     Mode=FindAncestor}, Path=DataContext.Connect}"
                                                   CommandParameter="{Binding}"
