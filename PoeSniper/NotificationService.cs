@@ -10,12 +10,12 @@ namespace PoeSniperUI
 {
     public class NotificationService
     {
-        public void ShowNotification(string message)
+        public void ShowNotification(string name, string message)
         {
             string body = $@"<toast>
                       <visual>
                         <binding template='ToastGeneric'>
-                          <text>TradeOffer</text>
+                          <text>{name}</text>
                           <text>{message}</text>
                         </binding>
                       </visual>
