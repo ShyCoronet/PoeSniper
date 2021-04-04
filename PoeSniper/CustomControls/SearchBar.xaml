@@ -20,12 +20,23 @@
                 </DataTrigger>
             </Style.Triggers>
         </Style>
+        <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource Input}">
+            <Setter Property="IsReadOnly" Value="False"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsActive, ElementName=this}" Value="True">
+                    <Setter Property="IsReadOnly" Value="True"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsLoading, ElementName=this}" Value="True">
+                    <Setter Property="IsReadOnly" Value="True"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
     </UserControl.Resources>
     <Border>
         <StackPanel Orientation="Horizontal">
             <Grid>
                 <TextBox x:Name="NameInput" Text="{Binding TextName, ElementName=this}" Width="300px" Height="40px" 
-                     Style="{StaticResource Input}" Margin="6,0,6,0"/>
+                         Margin="6,0,6,0"/>
                 <TextBlock Text="Name">
                     <TextBlock.Style>
                         <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource RobotoFontStyle}">
@@ -47,7 +58,7 @@
             </Grid>
             <Grid>
                 <TextBox x:Name="Url" Text="{Binding TextUrl, ElementName=this}" Width="500px" Height="40px"
-                     Style="{StaticResource Input}" Margin="0,0,6,0"/>
+                         Margin="0,0,6,0"/>
                 <TextBlock Text="URL">
                     <TextBlock.Style>
                         <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource RobotoFontStyle}">
