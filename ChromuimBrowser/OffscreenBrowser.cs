@@ -2,6 +2,7 @@
 using CefSharp.OffScreen;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -20,7 +21,7 @@ namespace ChromuimBrowser
 
         public OffscreenBrowser()
         {
-            var settings = new CefSettings() { CachePath = @"D:\CefSharpExample\CefSharpExample\Cache\" };
+            var settings = new CefSettings();
             settings.CefCommandLineArgs["autoplay-policy"] = "no-user-gesture-required";
             
             if (!Cef.IsInitialized)
@@ -30,6 +31,7 @@ namespace ChromuimBrowser
 
             browser = new ChromiumWebBrowser("", null, new RequestContext());
             autoResetEvent = new AutoResetEvent(false);
+
             browser.BrowserInitialized += InitialBrowser;
             autoResetEvent.WaitOne();
         }
@@ -50,10 +52,7 @@ namespace ChromuimBrowser
 
             browser.LoadingStateChanged += handler;
 
-            if (!string.IsNullOrEmpty(url))
-            {
-                browser.Load(url);
-            }
+            if (!string.IsNullOrEmpty(url)) browser.Load(url);
 
             return task.Task;
         }
@@ -99,10 +98,7 @@ namespace ChromuimBrowser
 
         private void InitialBrowser(object sender, EventArgs e)
         {
-            if (browser.IsBrowserInitialized)
-            {
-                autoResetEvent.Set();
-            }
+            if (browser.IsBrowserInitialized) autoResetEvent.Set();
         }
     }
 }
