@@ -1,15 +1,16 @@
-﻿using System;
+﻿using PoeSniperCore;
+using PoeSniperCore.EventsArgs;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using KeyboardHook;
 
 namespace PoeSniperUI
 {
     public class ApplicationViewModel : ViewModelBase
     {
-        private const int maxSearchCount = 12;    // the maximum number of searches for an official trade is 12
         private int searchesCount;
         private string sessionId = "a140bcc59bb595c5c5253b2d091a9298";
         private NotificationService notificationService;
@@ -50,7 +51,7 @@ namespace PoeSniperUI
                 
                 () => 
                 {
-                    return searches.Count != maxSearchCount && sessionId != string.Empty;
+                    return sessionId != string.Empty;
                 }));
             }
         }
@@ -125,7 +126,7 @@ namespace PoeSniperUI
                     {
                         Task.Run(() =>
                         {
-                            search.TradeSniper.TradeOfferReceived += OnTradeOfferReceived;
+                            search.TradeSniper.TradeOfferMessageReceived += OnTradeOfferReceived;
                             search.TradeSniper.StartSnipe();
                         });
                     }
@@ -133,7 +134,7 @@ namespace PoeSniperUI
                     {
                         Task.Run(() =>
                         {
-                            search.TradeSniper.TradeOfferReceived -= OnTradeOfferReceived;
+                            search.TradeSniper.TradeOfferMessageReceived -= OnTradeOfferReceived;
                             search.TradeSniper.StopSnipe();
                         });
                     }
@@ -171,10 +172,12 @@ namespace PoeSniperUI
             }
         }
 
-        private void OnTradeOfferReceived(object sender, CefSharp.ConsoleMessageEventArgs e)
+        private void OnTradeOfferReceived(object sender, TradeOfferMessageEventArgs e)
         {
-            notificationService.ShowNotification(e.Message);
-            Application.Current.Dispatcher.Invoke(() => searchResults.Add(e.Message));
+            var sniper = sender as PoeTradeSniper;
+            var search = searches.FirstOrDefault(search => search.TradeSniper.Guid == sniper.Guid);
+            notificationService.ShowNotification(search.Name, e.TradeOfferMessage);
+            Application.Current.Dispatcher.Invoke(() => searchResults.Add(e.TradeOfferMessage));
         }
     }
 }
