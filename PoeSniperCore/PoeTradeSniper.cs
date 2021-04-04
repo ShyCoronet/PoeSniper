@@ -1,7 +1,9 @@
 ﻿using CefSharp;
 using ChromuimBrowser;
 using System;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using PoeSniperCore.EventsArgs;
 
 namespace PoeSniperCore
 {
@@ -12,7 +14,9 @@ namespace PoeSniperCore
         private bool isActive;
         private bool isLoading;
         private bool isConnected;
+        private Regex filter = new(@"@\S*");
 
+        public Guid Guid { get; }
         public string Url { get; set; }
         public bool IsActive
         {
@@ -29,7 +33,7 @@ namespace PoeSniperCore
             private set
             {
                 isLoading = value;
-                LoadingStateChanged?.Invoke(this, new LoadingStateChangedEventArgs(value));
+                LoadingStateChanged?.Invoke(this, new EventsArgs.LoadingStateChangedEventArgs(value));
             }
         }
         public bool IsConnected
@@ -43,18 +47,15 @@ namespace PoeSniperCore
         }
 
         public event EventHandler<SniperStateChangedEventArgs> SniperStateChanged;
-        public event EventHandler<LoadingStateChangedEventArgs> LoadingStateChanged;
-        public event EventHandler<ConnectionStateChangedEventArgs> ConnectionStateChanged; 
-        public event EventHandler<ConsoleMessageEventArgs> TradeOfferReceived
-        {
-            add => browser.ConsoleMessageReceive += value;
-            remove => browser.ConsoleMessageReceive -= value;
-        }
+        public event EventHandler<EventsArgs.LoadingStateChangedEventArgs> LoadingStateChanged;
+        public event EventHandler<ConnectionStateChangedEventArgs> ConnectionStateChanged;
+        public event EventHandler<TradeOfferMessageEventArgs> TradeOfferMessageReceived;
 
-        public PoeTradeSniper(string url)
+        public PoeTradeSniper()
         {
+            Guid = Guid.NewGuid();
             browser = new OffscreenBrowser();
-            Url = url;
+            browser.ConsoleMessageReceive += FilteringConsoleMessage;
         }
 
         public void AuthenticationToPoeTrade(string sessionId)
@@ -71,7 +72,6 @@ namespace PoeSniperCore
             IsLoading = true;
             
             browser.LoadPage(Url).Wait();
-            Task.Delay(1000).Wait(); // Required for full execution of all scripts on the page
 
             IsLoading = false;
             IsConnected = CheckPoeTradePage();
@@ -97,7 +97,7 @@ namespace PoeSniperCore
             {
                 var result = browser.ExecuteJavaScriptAsync(script).Result;
                 IsActive = !result.Success;
-            }         
+            }
         }
 
         public void Dispose()
@@ -108,22 +108,30 @@ namespace PoeSniperCore
         private void InitialScript()
         {
             string script = "const config = { childList: true }\n" +
-                            "const callback = (mutationList, observer) => { const whisperBtn = document.querySelector('button.btn.btn-default.whisper-btn')\nif(whisperBtn !== null) { console.log(whisperBtn._v_clipboard.text()) } }\n" +
-                            "const target = document.querySelector('div.results')\n" +
+                            "const callback = (mutationList, observer) => { " +
+                            "const whisperBtn = document.querySelector('a.whisper-btn')\n" +
+                            "if(whisperBtn !== null) { console.log(whisperMessage(whisperBtn)) } }\n" +
+                            "const target = document.querySelector('#items')\n" +
                             "const observer = new MutationObserver(callback)\n";
 
-            isInitialScript = browser.ExecuteJavaScriptAsync(script).Result.Success;
+            if (isConnected)
+                isInitialScript = browser.ExecuteJavaScriptAsync(script).Result.Success;
         }
 
         private bool CheckPoeTradePage()
         {
-            string script = "const checkingScript = () => {let result = document.querySelector('button.btn.livesearch-btn')" +
-                                                            ".children[1].textContent === 'Deactivate Live Search'\n" +
-                                                            "if(!result) throw 'Not live search' }\n" +
+            string script = "const checkingScript = () => { let result = document.querySelector('div.alert-box.live-search')\n" +
+                                                            "if (result === null) throw 'Not live search' }\n" +
                                                             "checkingScript()";
-            bool isPoeTradeLiveSearch = browser.ExecuteJavaScriptAsync(script).Result.Success;  
+            bool isPoeTradeLiveSearch = browser.ExecuteJavaScriptAsync(script).Result.Success;
 
             return isPoeTradeLiveSearch;
+        }
+
+        private void FilteringConsoleMessage(object sender, ConsoleMessageEventArgs e)
+        {
+            if (filter.IsMatch(e.Message))
+                TradeOfferMessageReceived?.Invoke(this, new TradeOfferMessageEventArgs(e.Message));
         }
     }
 }
