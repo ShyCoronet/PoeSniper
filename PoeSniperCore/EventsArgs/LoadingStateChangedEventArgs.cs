@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PoeSniperCore
+namespace PoeSniperCore.EventsArgs
 {
     public class LoadingStateChangedEventArgs : EventArgs
     {

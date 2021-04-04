@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace PoeSniperCore
+namespace PoeSniperCore.EventsArgs
 {
     public class ConnectionStateChangedEventArgs : EventArgs
     {
