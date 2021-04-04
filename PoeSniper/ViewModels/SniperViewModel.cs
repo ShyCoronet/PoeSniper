@@ -1,4 +1,5 @@
 ﻿using PoeSniperCore;
+using PoeSniperCore.EventsArgs;
 
 namespace PoeSniperUI
 {
@@ -43,8 +44,7 @@ namespace PoeSniperUI
 
         public SniperViewModel(string sessionId)
         {
-            TradeSniper = new PoeTradeSniper("https://www.pathofexile.com/trade/search/Ritual/1EQ0s5/live");
-            TradeSniper.AuthenticationToPoeTrade(sessionId);
+            TradeSniper = new PoeTradeSniper();
             TradeSniper.SniperStateChanged += OnObserverStateChanged;
             TradeSniper.LoadingStateChanged += OnLoadingStateChanged;
             TradeSniper.ConnectionStateChanged += OnConnectionStateChanged;
