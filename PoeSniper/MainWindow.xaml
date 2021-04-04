@@ -166,37 +166,11 @@
             </Grid.RowDefinitions>
             <Border Margin="6,6,6,6" Background="#36393f" CornerRadius="12" Grid.Row="0">
                 <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition/>
-                        <ColumnDefinition/>
-                    </Grid.ColumnDefinitions>
-                    <Grid Grid.Column="0" HorizontalAlignment="Left">
-                        <TextBox x:Name="SessionId" Text="{Binding SessionId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                                 Style="{StaticResource Input}" Height="40px" Margin="6,0,0,0" Width="500px"/>
-                        <TextBlock Text="POESESSID">
-                            <TextBlock.Style>
-                                <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource RobotoFontStyle}">
-                                    <Setter Property="IsHitTestVisible" Value="False"/>
-                                    <Setter Property="Visibility" Value="Collapsed"/>
-                                    <Setter Property="Foreground" Value="#FFFFFF"/>
-                                    <Setter Property="Opacity" Value="0.5"/>
-                                    <Setter Property="Margin" Value="18,0,0,0"/>
-                                    <Setter Property="VerticalAlignment" Value="Center"/>
-                                    <Setter Property="FontSize" Value="{Binding FontSize, ElementName=SessionId}"/>
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Text, ElementName=SessionId}" Value="">
-                                            <Setter Property="Visibility" Value="Visible"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </TextBlock.Style>
-                        </TextBlock>
-                    </Grid>
                     <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
                         <Border Style="{StaticResource InputBorder}" Height="40px" Width="140px" Margin="0,0,12,0">
                             <TextBlock Style="{StaticResource RobotoFontStyle}" Foreground="#FFFFFF"
                                    FontSize="16px" HorizontalAlignment="Center" VerticalAlignment="Center" 
-                                   Text="{Binding SearchesCount, StringFormat={}Count: {0}/12}"/>
+                                   Text="{Binding SearchesCount, StringFormat={}Count: {0}}"/>
                         </Border>
                         <Button Command="{Binding AddSearch}" Background="#9147ff" Height="40px" Width="100px" Margin="0,0,6,0" 
                             Style="{StaticResource ButtonStyle}">
