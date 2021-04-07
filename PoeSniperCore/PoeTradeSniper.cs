@@ -75,6 +75,8 @@ namespace PoeSniperCore
         {
             if (!isInitialScript) InitialScript();
 
+            if (!isConnected) return false;
+
             string script = "observer.observe(target, config)";
 
             var result = browser.ExecuteJavaScriptAsync(script).Result;
