@@ -7,22 +7,19 @@ using System.Windows.Input;
 
 namespace PoeSniper
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
-        ApplicationViewModel ApplicationView;
-        string sessionFilePath;
+        private ApplicationViewModel ApplicationView;
+        private string sessionFilePath;
 
         public MainWindow()
         {
             MaxHeight = SystemParameters.MaximizedPrimaryScreenHeight;
             MaxWidth = SystemParameters.MaximizedPrimaryScreenWidth;
-            sessionFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory);
+            sessionFilePath = Path.Combine(GetStoragePath(), "session.json");
             InitializeComponent();
-            //GetLastSessionState();
-            //this.Closed += SaveLastSessionState;
+            GetLastSessionState();
+            this.Closed += SaveLastSessionState;
             if (ApplicationView == null) ApplicationView = new ApplicationViewModel();
             DataContext = ApplicationView;
         }
@@ -72,6 +69,16 @@ namespace PoeSniper
         private void DragWindow(object sender, MouseButtonEventArgs e)
         {
             if (e.LeftButton == MouseButtonState.Pressed) this.DragMove();
+        }
+
+        private string GetStoragePath()
+        {
+            string appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            string appStoragePath = Path.Combine(appDataPath, "PoeSniper");
+
+            if (Directory.Exists(appDataPath)) Directory.CreateDirectory(appStoragePath);
+
+            return appStoragePath;
         }
     }
 }
