@@ -21,7 +21,7 @@ namespace PoeSniperUI
             keyHook.KeyDown += OnPaste;
         }
 
-        public void Install()
+        public void Start()
         {
             keyHook.Install();
         }
