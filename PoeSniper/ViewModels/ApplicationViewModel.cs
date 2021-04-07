@@ -34,7 +34,6 @@ namespace PoeSniperUI
         [JsonIgnore]
         public IList<string> searchResults { get; }
 
-        [JsonIgnore]
         public int SearchesCount
         {
             get => this.searchesCount;
