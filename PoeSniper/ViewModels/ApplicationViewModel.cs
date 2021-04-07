@@ -4,16 +4,21 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using Newtonsoft.Json;
 using System.Threading.Tasks;
 using System.Windows;
 
 namespace PoeSniperUI
 {
+    [Serializable]
     public class ApplicationViewModel : ViewModelBase
     {
         private int searchesCount;
-        private string sessionId = "a140bcc59bb595c5c5253b2d091a9298";
+
+        [JsonIgnore]
         private NotificationService notificationService;
+
+        [JsonIgnore]
         private PasteCommandHandler pasteHandler;
 
         private RelayCommand addSearch;
@@ -25,37 +30,31 @@ namespace PoeSniperUI
         private RelayCommand removeAllResutls;
 
         public IList<SniperViewModel> searches { get; }
+
+        [JsonIgnore]
         public IList<string> searchResults { get; }
 
+        [JsonIgnore]
         public int SearchesCount
         {
             get => this.searchesCount;
             set => this.SetProperty(ref searchesCount, value, nameof(SearchesCount));
         }
 
-        public string SessionId
-        {
-            get => this.sessionId;
-            set => this.SetProperty(ref sessionId, value.Trim(), nameof(SessionId));
-        }
-
+        [JsonIgnore]
         public RelayCommand AddSearch
         {
             get
             {
                 return addSearch ?? (addSearch = new RelayCommand(() =>
                 {
-                    searches.Add(new SniperViewModel(SessionId));
+                    searches.Add(new SniperViewModel());
                     SearchesCount = searches.Count;
-                }, 
-                
-                () => 
-                {
-                    return sessionId != string.Empty;
                 }));
             }
         }
 
+        [JsonIgnore]
         public RelayCommand RemoveSearch
         {
             get
@@ -68,7 +67,8 @@ namespace PoeSniperUI
                 }));
             }
         }
-  
+
+        [JsonIgnore]
         public RelayCommand RemoveAllSearches
         {
             get
@@ -84,7 +84,8 @@ namespace PoeSniperUI
                 }));
             }
         }
-  
+
+        [JsonIgnore]
         public RelayCommand Connect
         {
             get
@@ -100,7 +101,8 @@ namespace PoeSniperUI
                 }));
             }
         }
-  
+
+        [JsonIgnore]
         public RelayCommand ConnectAllSearches
         {
             get
@@ -116,6 +118,7 @@ namespace PoeSniperUI
             }
         }
 
+        [JsonIgnore]
         public RelayCommand ChangeStateSearch
         {
             get
@@ -141,7 +144,8 @@ namespace PoeSniperUI
                 }));
             }
         }
- 
+
+        [JsonIgnore]
         public RelayCommand RemoveAllResults
         {
             get
@@ -160,7 +164,7 @@ namespace PoeSniperUI
             notificationService = new NotificationService();
             pasteHandler = new PasteCommandHandler();
             pasteHandler.Pasted += PopTradeOffer;
-            pasteHandler.Install();
+            pasteHandler.Start();
         }
 
         private void PopTradeOffer(object sender, EventArgs e)
