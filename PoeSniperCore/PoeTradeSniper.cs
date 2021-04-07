@@ -2,7 +2,6 @@
 using ChromuimBrowser;
 using System;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using PoeSniperCore.EventsArgs;
 
 namespace PoeSniperCore
@@ -56,11 +55,6 @@ namespace PoeSniperCore
             Guid = Guid.NewGuid();
             browser = new OffscreenBrowser();
             browser.ConsoleMessageReceive += FilteringConsoleMessage;
-        }
-
-        public void AuthenticationToPoeTrade(string sessionId)
-        {
-            browser.SetCookie("https://www.pathofexile.com/", "POESESSID", sessionId);
         }
 
         public void LoadPage()
