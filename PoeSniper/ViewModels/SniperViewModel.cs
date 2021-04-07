@@ -1,15 +1,20 @@
-﻿using PoeSniperCore;
+﻿using Newtonsoft.Json;
+using PoeSniperCore;
 using PoeSniperCore.EventsArgs;
+using System;
 
 namespace PoeSniperUI
 {
+    [Serializable]
     public class SniperViewModel : ViewModelBase
     {
         private string name = string.Empty;
+
         private bool isActive;
         private bool isLoading;
         private bool isConnected;
 
+        [JsonIgnore]
         public PoeTradeSniper TradeSniper { get; }
 
         public string Name
@@ -24,25 +29,28 @@ namespace PoeSniperUI
             set => this.TradeSniper.Url = value.Trim();
         }
 
+        [JsonIgnore]
         public bool IsActive
         {
             get => this.isActive;
             set => this.SetProperty(ref isActive, value, nameof(IsActive));
         }
 
+        [JsonIgnore]
         public bool IsLoading
         {
             get => this.isLoading;
             set => this.SetProperty(ref isLoading, value, nameof(IsLoading));
         }
 
+        [JsonIgnore]
         public bool IsConnected
         {
             get => this.isConnected;
             set => this.SetProperty(ref isConnected, value, nameof(IsConnected));
         }
 
-        public SniperViewModel(string sessionId)
+        public SniperViewModel()
         {
             TradeSniper = new PoeTradeSniper();
             TradeSniper.SniperStateChanged += OnObserverStateChanged;
