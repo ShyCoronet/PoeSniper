@@ -51,7 +51,7 @@
             <RowDefinition/>
         </Grid.RowDefinitions>
         <!--#region TitlePanel-->
-        <Grid x:Name="TitlePanel" Background="#202225" Grid.Row="0">
+        <Grid x:Name="TitlePanel" Background="#202225" Grid.Row="0" MouseLeftButtonDown="DragWindow">
             <StackPanel Style="{StaticResource TitleButtons}">
                 <Border x:Name="MinimizeButtonBorder" Cursor="Hand" MouseDown="MinimizeWindow">
                     <Path Style="{StaticResource TitleIcon}" x:Name="MinimizeButton" Data="{StaticResource Line}">
@@ -70,7 +70,7 @@
                         </Style>
                     </Border.Style>
                 </Border>
-                <Border x:Name="MaximizeButtonBorder" Cursor="Hand" MouseDown="MaximizeWindow">
+                <Border x:Name="MaximizeButtonBorder" Cursor="Hand" MouseDown="ChangeWindowSize">
                     <Path Style="{StaticResource TitleIcon}" x:Name="MaximizeButton" Data="{StaticResource Square}">
                         <Path.LayoutTransform>
                             <ScaleTransform ScaleX="0.02" ScaleY="0.02"/>
