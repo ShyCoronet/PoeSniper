@@ -22,6 +22,7 @@ namespace ChromuimBrowser
         {
             var settings = new CefSettings();
             settings.CefCommandLineArgs["autoplay-policy"] = "no-user-gesture-required";
+            settings.LogSeverity = LogSeverity.Disable;
             
             if (!Cef.IsInitialized)
                 Cef.Initialize(settings, performDependencyCheck: true, browserProcessHandler: null);
