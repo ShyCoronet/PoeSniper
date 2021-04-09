@@ -16,7 +16,7 @@ namespace PoeSniperCore
         private Regex filter = new(@"@\S*");
 
         public Guid Guid { get; }
-        public string Url { get; set; }
+        public string Url { get; set; } = string.Empty;
         public bool IsActive
         {
             get => isActive;
