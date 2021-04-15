@@ -54,9 +54,8 @@ namespace PoeSniperCore
         {
             Guid = Guid.NewGuid();
             browser = new OffscreenBrowser();
-            browser.ConsoleMessageReceive += FilteringConsoleMessage;
+            browser.JsMessageReceived += OnTradeMessageReceived;
         }
-
         public void LoadPage()
         {
             if (IsActive) StopSnipe();
@@ -106,12 +105,17 @@ namespace PoeSniperCore
             string script = "const config = { childList: true }\n" +
                             "const callback = (mutationList, observer) => { " +
                             "const whisperBtn = document.querySelector('a.whisper-btn')\n" +
-                            "if(whisperBtn !== null) { console.log(whisperMessage(whisperBtn)) } }\n" +
+                            "if(whisperBtn !== null) { CefSharp.PostMessage(whisperMessage(whisperBtn)) } }\n" +
                             "const target = document.querySelector('#items')\n" +
                             "const observer = new MutationObserver(callback)\n";
 
             if (isConnected)
                 isInitialScript = browser.ExecuteJavaScriptAsync(script).Result.Success;
+        }
+
+        private void OnTradeMessageReceived(object sender, JavascriptMessageReceivedEventArgs e)
+        {
+            TradeOfferMessageReceived?.Invoke(this, new TradeOfferMessageEventArgs(e.Message as string));
         }
 
         private bool CheckPoeTradePage()
@@ -122,12 +126,6 @@ namespace PoeSniperCore
             bool isPoeTradeLiveSearch = browser.ExecuteJavaScriptAsync(script).Result.Success;
 
             return isPoeTradeLiveSearch;
-        }
-
-        private void FilteringConsoleMessage(object sender, ConsoleMessageEventArgs e)
-        {
-            if (filter.IsMatch(e.Message))
-                TradeOfferMessageReceived?.Invoke(this, new TradeOfferMessageEventArgs(e.Message));
         }
     }
 }
