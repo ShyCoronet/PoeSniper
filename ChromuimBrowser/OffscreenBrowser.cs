@@ -12,10 +12,10 @@ namespace ChromuimBrowser
         private ChromiumWebBrowser browser;
         private AutoResetEvent autoResetEvent;
 
-        public event EventHandler<ConsoleMessageEventArgs> ConsoleMessageReceive
+        public event EventHandler<JavascriptMessageReceivedEventArgs> JsMessageReceived
         {
-            add => browser.ConsoleMessage += value;
-            remove => browser.ConsoleMessage -= value;
+            add => browser.JavascriptMessageReceived += value;
+            remove => browser.JavascriptMessageReceived -= value;
         }
 
         public OffscreenBrowser()
