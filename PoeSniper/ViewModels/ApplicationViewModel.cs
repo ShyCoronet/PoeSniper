@@ -91,7 +91,7 @@ namespace PoeSniperUI
             {
                 return connect ?? (connect = new RelayCommand<SniperViewModel>((search) =>
                 {
-                    Task.Run(() => search.TradeSniper.LoadPage());
+                    Task.Run(() => search.TradeSniper.TryConnect());
                 },
                 (search) =>
                 {
@@ -111,7 +111,7 @@ namespace PoeSniperUI
                 foreach (var search in searches)
                 {
                     if (!search.IsLoading)
-                        Task.Run(() => search.TradeSniper.LoadPage());
+                        Task.Run(() => search.TradeSniper.TryConnect());
                 }
                 }));
             }
@@ -126,10 +126,10 @@ namespace PoeSniperUI
                 {
                     if (!search.IsActive)
                     {
-                        Task.Run(() =>
+                        Task.Run(async () =>
                         {
                             search.TradeSniper.TradeOfferMessageReceived += OnTradeOfferReceived;
-                            search.TradeSniper.StartSnipe();
+                            await search.TradeSniper.StartSnipe();
                         });
                     }
                     else
@@ -175,12 +175,17 @@ namespace PoeSniperUI
             }
         }
 
-        private void OnTradeOfferReceived(object sender, TradeOfferMessageEventArgs e)
+        private void OnTradeOfferReceived(object sender, TradeOffersEventArgs e)
         {
             var sniper = sender as PoeTradeSniper;
             var search = searches.FirstOrDefault(search => search.TradeSniper.Guid == sniper.Guid);
-            notificationService.ShowNotification(search.Name, e.TradeOfferMessage);
-            Application.Current.Dispatcher.Invoke(() => searchResults.Add(e.TradeOfferMessage));
+            string message = $"{e.TradeOffers.Count()} new items have matched your search.";
+
+            notificationService.ShowNotification(search.Name, message);
+
+            foreach (var offer in e.TradeOffers) {
+                Application.Current.Dispatcher.Invoke(() => searchResults.Add(offer.ToString()));
+            }
         }
     }
 }

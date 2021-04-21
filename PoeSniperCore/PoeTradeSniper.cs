@@ -1,19 +1,19 @@
-﻿using CefSharp;
-using ChromuimBrowser;
-using System;
-using System.Text.RegularExpressions;
+﻿using System;
 using PoeSniperCore.EventsArgs;
+using Models;
+using PoeTrade;
+using System.Threading.Tasks;
+using Utils;
+using System.Collections.Generic;
 
 namespace PoeSniperCore
 {
     public class PoeTradeSniper : IDisposable
     {
-        private OffscreenBrowser browser;
-        private bool isInitialScript;
+        private readonly ITradeObserver observer;
         private bool isActive;
         private bool isLoading;
         private bool isConnected;
-        private Regex filter = new(@"@\S*");
 
         public Guid Guid { get; }
         public string Url { get; set; } = string.Empty;
@@ -48,84 +48,63 @@ namespace PoeSniperCore
         public event EventHandler<SniperStateChangedEventArgs> SniperStateChanged;
         public event EventHandler<EventsArgs.LoadingStateChangedEventArgs> LoadingStateChanged;
         public event EventHandler<ConnectionStateChangedEventArgs> ConnectionStateChanged;
-        public event EventHandler<TradeOfferMessageEventArgs> TradeOfferMessageReceived;
+        public event EventHandler<TradeOffersEventArgs> TradeOfferMessageReceived;
 
         public PoeTradeSniper()
         {
             Guid = Guid.NewGuid();
-            browser = new OffscreenBrowser();
-            browser.JsMessageReceived += OnTradeMessageReceived;
+            observer = new PoeTradeObserver();
         }
-        public void LoadPage()
+
+        public async Task TryConnect()
         {
             if (IsActive) StopSnipe();
 
             IsConnected = false;
-            isInitialScript = false;
             IsLoading = true;
-            
-            browser.LoadPage(Url).Wait();
+
+            bool result = await observer.TryConnectToTrade(Url);
 
             IsLoading = false;
-            IsConnected = CheckPoeTradePage();
+            IsConnected = result;
         }
 
-        public bool StartSnipe()
+        public async Task StartSnipe()
         {
-            if (!isInitialScript) InitialScript();
+            if (IsActive) StopSnipe();
 
-            if (!isConnected) return false;
+            if (!isConnected) return;
 
-            string script = "observer.observe(target, config)";
-
-            var result = browser.ExecuteJavaScriptAsync(script).Result;
-            IsActive = result.Success;
-
-            return IsActive;
+            IsActive = true;
+            await observer.TryStartObserve(Url, (result) => {
+                switch (result) {
+                    case Success<IEnumerable<TradeOffer>> res:
+                        OnTradeOffersReceived(res.Value);
+                        break;
+                    case Failure<IEnumerable<TradeOffer>> res:
+                        IsActive = false;
+                        throw res.Exception;
+                }
+            });
         }
 
         public void StopSnipe()
         {
-            string script = "observer.disconnect()";
-
             if (IsActive)
             {
-                var result = browser.ExecuteJavaScriptAsync(script).Result;
-                IsActive = !result.Success;
+                observer.StopObserve();
+                IsActive = false;
             }
         }
 
         public void Dispose()
         {
-            browser.Dispose();
+            observer.Dispose();
         }
 
-        private void InitialScript()
+        private void OnTradeOffersReceived(IEnumerable<TradeOffer> offers)
         {
-            string script = "const config = { childList: true }\n" +
-                            "const callback = (mutationList, observer) => { " +
-                            "const whisperBtn = document.querySelector('a.whisper-btn')\n" +
-                            "if(whisperBtn !== null) { CefSharp.PostMessage(whisperMessage(whisperBtn)) } }\n" +
-                            "const target = document.querySelector('#items')\n" +
-                            "const observer = new MutationObserver(callback)\n";
-
-            if (isConnected)
-                isInitialScript = browser.ExecuteJavaScriptAsync(script).Result.Success;
-        }
-
-        private void OnTradeMessageReceived(object sender, JavascriptMessageReceivedEventArgs e)
-        {
-            TradeOfferMessageReceived?.Invoke(this, new TradeOfferMessageEventArgs(e.Message as string));
-        }
-
-        private bool CheckPoeTradePage()
-        {
-            string script = "const checkingScript = () => { let result = document.querySelector('div.alert-box.live-search')\n" +
-                                                            "if (result === null) throw 'Not live search' }\n" +
-                                                            "checkingScript()";
-            bool isPoeTradeLiveSearch = browser.ExecuteJavaScriptAsync(script).Result.Success;
-
-            return isPoeTradeLiveSearch;
+            TradeOfferMessageReceived?.Invoke(this, new TradeOffersEventArgs(offers));
         }
     }
 }
