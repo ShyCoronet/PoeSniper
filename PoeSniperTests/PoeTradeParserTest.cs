@@ -1,10 +1,7 @@
-using PoeTrade;
-using System;
-using System.Collections;
+using PoeSniperCore.PoeTrade;
 using System.IO;
 using System.Linq;
 using Xunit;
-using Xunit.Sdk;
 
 namespace PoeSniperTests {
     public class PoeTradeParserTest {

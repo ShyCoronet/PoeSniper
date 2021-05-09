@@ -15,7 +15,7 @@ namespace PoeSniperUI
         private bool isConnected;
 
         [JsonIgnore]
-        public PoeTradeSniper TradeSniper { get; }
+        public PoeTradeSniper TradeSniper { get; } = new PoeTradeSniper();
 
         public string Name
         {
@@ -52,10 +52,13 @@ namespace PoeSniperUI
 
         public SniperViewModel()
         {
-            TradeSniper = new PoeTradeSniper();
             TradeSniper.SniperStateChanged += OnObserverStateChanged;
             TradeSniper.LoadingStateChanged += OnLoadingStateChanged;
             TradeSniper.ConnectionStateChanged += OnConnectionStateChanged;
+        }
+
+        public SniperViewModel(SniperOption options) : this() {
+            TradeSniper.options = options;
         }
 
         private void OnObserverStateChanged(object sender, SniperStateChangedEventArgs e)

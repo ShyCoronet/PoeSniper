@@ -84,7 +84,7 @@
             </Style.Triggers>
         </Style>
         <!--#endregion-->
-        <!--#region TextBoxStyle-->
+        <!--#region InputStyle-->
         <Style x:Key="Input" TargetType="{x:Type TextBox}">
             <Setter Property="Background" Value="#40444b"/>
             <Setter Property="Foreground" Value="#ffffff"/>

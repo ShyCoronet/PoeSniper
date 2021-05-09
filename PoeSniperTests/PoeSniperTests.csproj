@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TradeCore\PoeTrade.csproj" />
+    <ProjectReference Include="..\PoeSniperCore\PoeSniperCore.csproj" />
   </ItemGroup>
 
 </Project>

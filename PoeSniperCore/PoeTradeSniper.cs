@@ -1,22 +1,24 @@
 ﻿using System;
 using PoeSniperCore.EventsArgs;
-using Models;
-using PoeTrade;
+using PoeSniperCore.Models;
 using System.Threading.Tasks;
 using Utils;
 using System.Collections.Generic;
+using Serilog;
 
 namespace PoeSniperCore
 {
     public class PoeTradeSniper : IDisposable
     {
-        private readonly ITradeObserver observer;
+        private ITradeObserver observer;
+        private ILogger logger;
         private bool isActive;
         private bool isLoading;
         private bool isConnected;
 
         public Guid Guid { get; }
         public string Url { get; set; } = string.Empty;
+        public SniperOption options { get; set; }
         public bool IsActive
         {
             get => isActive;
@@ -32,7 +34,7 @@ namespace PoeSniperCore
             private set
             {
                 isLoading = value;
-                LoadingStateChanged?.Invoke(this, new EventsArgs.LoadingStateChangedEventArgs(value));
+                LoadingStateChanged?.Invoke(this, new LoadingStateChangedEventArgs(value));
             }
         }
         public bool IsConnected
@@ -46,24 +48,34 @@ namespace PoeSniperCore
         }
 
         public event EventHandler<SniperStateChangedEventArgs> SniperStateChanged;
-        public event EventHandler<EventsArgs.LoadingStateChangedEventArgs> LoadingStateChanged;
+        public event EventHandler<LoadingStateChangedEventArgs> LoadingStateChanged;
         public event EventHandler<ConnectionStateChangedEventArgs> ConnectionStateChanged;
         public event EventHandler<TradeOffersEventArgs> TradeOfferMessageReceived;
 
         public PoeTradeSniper()
         {
             Guid = Guid.NewGuid();
-            observer = new PoeTradeObserver();
+            logger = new LoggerConfiguration().
+                WriteTo.File(@"C:\Users\mrche\AppData\Roaming\PoeSniper\Logs\log.txt")
+                .CreateLogger();
+        }
+
+        public PoeTradeSniper(SniperOption options) : this() {
+            this.options = options;
         }
 
         public async Task TryConnect()
         {
             if (IsActive) StopSnipe();
 
+            observer = TradeObserverFactory.CreateObserver(Url, options);
+
+            if (observer == null) return;
+
             IsConnected = false;
             IsLoading = true;
 
-            bool result = await observer.TryConnectToTrade(Url);
+            bool result = await observer.TryConnectToTradeAsync(Url);
 
             IsLoading = false;
             IsConnected = result;
@@ -71,19 +83,22 @@ namespace PoeSniperCore
 
         public async Task StartSnipe()
         {
-            if (IsActive) StopSnipe();
-
             if (!isConnected) return;
 
+            if (IsActive) StopSnipe();
+
             IsActive = true;
-            await observer.TryStartObserve(Url, (result) => {
+
+            await observer.StartObserveAsync(Url, (result) => {
                 switch (result) {
                     case Success<IEnumerable<TradeOffer>> res:
                         OnTradeOffersReceived(res.Value);
                         break;
+
                     case Failure<IEnumerable<TradeOffer>> res:
                         IsActive = false;
-                        throw res.Exception;
+                        logger.Error(res.Exception.Message);
+                        break;
                 }
             });
         }
@@ -92,14 +107,14 @@ namespace PoeSniperCore
         {
             if (IsActive)
             {
-                observer.StopObserve();
+                observer?.StopObserve();
                 IsActive = false;
             }
         }
 
         public void Dispose()
         {
-            observer.Dispose();
+            observer?.Dispose();
         }
 
         private void OnTradeOffersReceived(IEnumerable<TradeOffer> offers)

@@ -14,12 +14,15 @@ namespace PoeSniperUI
     public class ApplicationViewModel : ViewModelBase
     {
         private int searchesCount;
+        private string sessionId = string.Empty;
 
         [JsonIgnore]
-        private NotificationService notificationService;
+        private NotificationService notificationService =
+            new NotificationService();
 
         [JsonIgnore]
-        private PasteCommandHandler pasteHandler;
+        private PasteCommandHandler pasteHandler =
+            new PasteCommandHandler();
 
         private RelayCommand addSearch;
         private RelayCommand removeSearch;
@@ -29,15 +32,22 @@ namespace PoeSniperUI
         private RelayCommand changeStateSearch;
         private RelayCommand removeAllResutls;
 
-        public IList<SniperViewModel> searches { get; }
+        public IList<SniperViewModel> searches { get; } = 
+            new ObservableCollection<SniperViewModel>();
 
         [JsonIgnore]
-        public IList<string> searchResults { get; }
+        public IList<string> searchResults { get; } = 
+            new ObservableCollection<string>();
 
         public int SearchesCount
         {
-            get => this.searchesCount;
-            set => this.SetProperty(ref searchesCount, value, nameof(SearchesCount));
+            get => searchesCount;
+            set => SetProperty(ref searchesCount, value, nameof(SearchesCount));
+        }
+
+        public string SessionId {
+            get => sessionId;
+            set => SetProperty(ref sessionId, value, nameof(SessionId));
         }
 
         [JsonIgnore]
@@ -47,7 +57,8 @@ namespace PoeSniperUI
             {
                 return addSearch ?? (addSearch = new RelayCommand(() =>
                 {
-                    searches.Add(new SniperViewModel());
+                    var options = new SniperOption(new Dictionary<string, string> { { "POESESSID", sessionId } });
+                    searches.Add(new SniperViewModel(options));
                     SearchesCount = searches.Count;
                 }));
             }
@@ -158,10 +169,6 @@ namespace PoeSniperUI
 
         public ApplicationViewModel()
         {
-            searches = new ObservableCollection<SniperViewModel>();
-            searchResults = new ObservableCollection<string>();
-            notificationService = new NotificationService();
-            pasteHandler = new PasteCommandHandler();
             pasteHandler.Pasted += PopTradeOffer;
             pasteHandler.Start();
         }

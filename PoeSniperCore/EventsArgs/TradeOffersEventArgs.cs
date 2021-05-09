@@ -1,4 +1,4 @@
-﻿using Models;
+﻿using PoeSniperCore.Models;
 using System;
 using System.Collections.Generic;
 

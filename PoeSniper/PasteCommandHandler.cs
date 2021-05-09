@@ -15,6 +15,12 @@ namespace PoeSniperUI
         {
             keyHook = new GlobalKeyboardHook();
             keyHook.KeyDown += OnPaste;
+            keyHook.KeyUp += Reset;
+        }
+
+        private void Reset(Key key)
+        {
+            if (key == hotKey.Item1) lastKey = default;
         }
 
         public void Start()
@@ -31,7 +37,6 @@ namespace PoeSniperUI
 
             if (lastKey == hotKey.Item1 && key == hotKey.Item2)
             {
-                lastKey = default;
                 Pasted?.Invoke(null, null);
             }
         }
